@@ -1,76 +1,102 @@
 package com.example.counter;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Intent;
-import android.os.Build;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
+import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
+
 public class MainActivity extends AppCompatActivity {
-    private static final String CHANNEL_ID = "CounterChannel";
-    private static final int NOTIFICATION_ID = 1;
-    private TextView tvCounter;
-    private static int currentCount = 0;
+
+    private static final String PREFS = "counter_prefs";
+    private static final String KEY_COUNT = "count";
+
+    private int count;
+    private TextView tvCount;
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN
+                && event.getRepeatCount() == 0) {
+
+            int keyCode = event.getKeyCode();
+            if (keyCode == KeyEvent.KEYCODE_VOLUME_UP
+                    || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+
+                count++;
+                render();
+                animateIncrement();
+                getSharedPreferences(PREFS, MODE_PRIVATE)
+                        .edit().putInt(KEY_COUNT, count).apply();
+
+                return true;
+            }
+        } else if (event.getRepeatCount() > 0) {
+
+            return true;
+        }
+
+        return super.dispatchKeyEvent(event);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        createNotificationChannel();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tvCounter = findViewById(R.id.tvCounter);
-        if (savedInstanceState != null) {
-            currentCount = savedInstanceState.getInt("count", 0);
-        }
-        tvCounter.setText(String.valueOf(currentCount));
+        tvCount = findViewById(R.id.tvCount);
+        MaterialButton btnIncrement = findViewById(R.id.btnIncrement);
+        MaterialButton btnReset = findViewById(R.id.btnReset);
 
-        Button btnStart = findViewById(R.id.btnStart);
-        btnStart.setOnClickListener(v -> {
-            Log.d("Counter", "Start button clicked");  // <-- ДОБАВЬ
-            Intent serviceIntent = new Intent(this, CounterService.class);
-            startForegroundService(serviceIntent);  // <-- ОБЯЗАТЕЛЬНО!
-            Log.d("Counter", "Service intent sent");  // <-- ДОБАВЬ
+        SharedPreferences sp = getSharedPreferences(PREFS, MODE_PRIVATE);
+        count = sp.getInt(KEY_COUNT, 0);
+        render();
+        animateIncrement();
+
+        btnIncrement.setOnClickListener(v -> {
+            count++;
+            render();
+            animateIncrement();
+            sp.edit().putInt(KEY_COUNT, count).apply();
         });
 
-        Button btnStop = findViewById(R.id.btnStop);
-        btnStop.setOnClickListener(v -> {
-            Intent serviceIntent = new Intent(this, CounterService.class);
-            stopService(serviceIntent);
-        });
-
-        Button btnReset = findViewById(R.id.btnReset);
         btnReset.setOnClickListener(v -> {
-            currentCount = 0;
-            tvCounter.setText("0");
-            Intent resetIntent = new Intent(this, CounterService.class);
-            resetIntent.setAction("RESET");
-            startService(resetIntent);  // Отправляем reset в сервис
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Сбросить счётчик?")
+                    .setMessage("Текущее значение будет сброшено на 0.")
+                    .setPositiveButton("Сбросить", (dialog, which) -> {
+                        count = 0;
+                        render();
+                        animateIncrement();
+                        sp.edit().putInt(KEY_COUNT, count).apply();
+                    })
+                    .setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss())
+                    .show();
         });
     }
 
-    private void createNotificationChannel() {
-        Log.d("Counter", "Creating notification channel...");
-        NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID, "Counter Service",
-                NotificationManager.IMPORTANCE_DEFAULT);
-        channel.setDescription("Счетчик по громкости");
-        channel.setShowBadge(false);  // Без бейджа
-        NotificationManager manager = getSystemService(NotificationManager.class);
-        manager.createNotificationChannel(channel);
-        Log.d("Counter", "Channel created!");
+    private void render() {
+        tvCount.setText(String.valueOf(count));
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("count", currentCount);
-    }
+    private void animateIncrement() {
+        // лёгкий "памп" на кнопке
+        findViewById(R.id.btnIncrement).animate()
+                .scaleX(0.92f).scaleY(0.92f)
+                .setDuration(70)
+                .withEndAction(() -> findViewById(R.id.btnIncrement).animate()
+                        .scaleX(1f).scaleY(1f)
+                        .setDuration(120)
+                        .start())
+                .start();
 
-    public static void updateCount(int count) {
-        currentCount = count;
+        // haptic feedback
+        findViewById(R.id.btnIncrement)
+                .performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
     }
 }

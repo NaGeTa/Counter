@@ -1,36 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:padding="24dp">
 
     <TextView
-        android:id="@+id/tvCounter"
+        android:id="@+id/tvCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0"
-        android:textSize="72sp"
-        android:textStyle="bold" />
+        android:textAlignment="center"
+        android:textSize="90sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnIncrement"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintVertical_bias="0.5"
+        android:layout_marginBottom="22dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnIncrement"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:textAllCaps="false"
+        android:textSize="28sp"
+        app:cornerRadius="999dp"
+        app:rippleColor="?attr/colorControlHighlight"
+        app:layout_constraintTop_toBottomOf="@id/tvCount"
+        app:layout_constraintBottom_toTopOf="@id/btnReset"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnReset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Сброс" />
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
 
-    <Button
-        android:id="@+id/btnStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Запустить сервис" />
+        android:text=""
+        app:icon="@android:drawable/ic_menu_rotate"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="24dp"
 
-    <Button
-        android:id="@+id/btnStop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Остановить сервис" />
-</LinearLayout>
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+
+        app:cornerRadius="999dp"
+        app:layout_constraintTop_toBottomOf="@id/btnIncrement"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="180dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
