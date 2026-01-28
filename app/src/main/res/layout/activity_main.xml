@@ -62,4 +62,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="180dp"/>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSettings"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:contentDescription="Настройки"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        android:text=""
+        app:icon="@android:drawable/ic_menu_preferences"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
